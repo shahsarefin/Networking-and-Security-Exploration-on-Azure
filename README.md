@@ -1,4 +1,3 @@
-# Networking-and-Security-Exploration-on-Azure
 <p align="center">
   <img src="https://i.imgur.com/Ua7udoS.png" alt="Traffic Examination"/>
 </p>
@@ -38,7 +37,48 @@ In this project, we conduct network security and traffic analysis experiments us
 <p align="center">
   <img src="INSERT_IMAGE_URL" alt="Creating Virtual Machines" width="80%"/>
 </p>
-<p>Description of the setup process, including resource group creation, network configuration, and VM settings.</p>
+
+<h4>Step-by-Step Instructions:</h4>
+<ol>
+  <li>Create a Resource Group:
+    <ul>
+      <li>Go to the Azure Portal (<a href="https://portal.azure.com">portal.azure.com</a>).</li>
+      <li>Click "Resource Groups" > "Create."</li>
+      <li>Name the Resource Group (e.g., `Network-Security-Lab`) and select a region.</li>
+      <li>Click "Review + Create" and then "Create" to finalize.</li>
+    </ul>
+  </li>
+
+  <li>Create a Virtual Network:
+    <ul>
+      <li>Navigate to "Virtual Networks" and click "Create."</li>
+      <li>Set the name to `Network-Lab-VNet`, choose your resource group, and select the region.</li>
+      <li>Set the address space (e.g., `10.0.0.0/16`) and create a subnet (e.g., `Subnet-1` with `10.0.1.0/24`).</li>
+      <li>Click "Review + Create" and then "Create."</li>
+    </ul>
+  </li>
+
+  <li>Create the Windows 10 VM:
+    <ul>
+      <li>Go to "Virtual Machines" and click "Create" > "Azure Virtual Machine."</li>
+      <li>Name the VM `Windows-VM`, select the Windows 10 image, and choose your resource group and VNet.</li>
+      <li>Set the authentication to password, and enter a username and password (e.g., Username: `labuser`, Password: `SecurePass123!`).</li>
+      <li>Ensure the VM is in the same VNet and subnet created earlier.</li>
+      <li>Click "Review + Create" and then "Create."</li>
+    </ul>
+  </li>
+
+  <li>Create the Ubuntu VM:
+    <ul>
+      <li>Repeat the VM creation steps, but select the Ubuntu Server 20.04 image.</li>
+      <li>Name the VM `Ubuntu-VM`, and ensure it’s placed in the same VNet and subnet.</li>
+      <li>Use SSH keys or set a password for authentication.</li>
+      <li>Click "Review + Create" and then "Create."</li>
+    </ul>
+  </li>
+</ol>
+
+---
 
 <!-- Step 2: Observing ICMP Traffic -->
 <h3>Step 2: Observing ICMP Traffic</h3>
@@ -46,7 +86,32 @@ In this project, we conduct network security and traffic analysis experiments us
 <p align="center">
   <img src="INSERT_IMAGE_URL" alt="ICMP Traffic Observation" width="80%"/>
 </p>
-<p>Detailed observations of ICMP traffic between the VMs, including any issues encountered and how they were resolved.</p>
+
+<h4>Step-by-Step Instructions:</h4>
+<ol>
+  <li>Install Wireshark on the Windows VM:
+    <ul>
+      <li>RDP into the Windows VM using Remote Desktop Connection.</li>
+      <li>Download Wireshark from <a href="https://www.wireshark.org/">wireshark.org</a> and install it.</li>
+    </ul>
+  </li>
+
+  <li>Start Capturing ICMP Traffic:
+    <ul>
+      <li>Open Wireshark and start a new capture on the main network interface.</li>
+      <li>In the filter box, type `icmp` to isolate ICMP traffic.</li>
+    </ul>
+  </li>
+
+  <li>Ping the Ubuntu VM from the Windows VM:
+    <ul>
+      <li>Open Command Prompt and run <code>ping [Ubuntu-VM Private IP]</code>.</li>
+      <li>Observe the ICMP requests and replies in Wireshark, confirming connectivity.</li>
+    </ul>
+  </li>
+</ol>
+
+---
 
 <!-- Step 3: Configuring Network Security Groups -->
 <h3>Step 3: Configuring Network Security Groups (NSGs)</h3>
@@ -54,7 +119,32 @@ In this project, we conduct network security and traffic analysis experiments us
 <p align="center">
   <img src="INSERT_IMAGE_URL" alt="Configuring NSGs" width="80%"/>
 </p>
-<p>Explanation of the configuration changes made to the NSGs and the impact on traffic as observed in Wireshark.</p>
+
+<h4>Step-by-Step Instructions:</h4>
+<ol>
+  <li>Configure NSG for the Ubuntu VM:
+    <ul>
+      <li>Navigate to "Network Security Groups" in the Azure Portal and click "Create."</li>
+      <li>Name the NSG (e.g., `Ubuntu-NSG`) and assign it to the resource group.</li>
+      <li>Once created, go to the NSG settings and add an inbound security rule to allow ICMP traffic:
+        <ul>
+          <li>Set source and destination to `Any`, protocol to `ICMP`, and action to `Allow`.</li>
+          <li>Name the rule `Allow-ICMP` and save.</li>
+        </ul>
+      </li>
+      <li>Associate the NSG with the Ubuntu VM’s network interface.</li>
+    </ul>
+  </li>
+
+  <li>Testing NSG Rules:
+    <ul>
+      <li>Ping the Ubuntu VM again from the Windows VM to confirm ICMP traffic is allowed.</li>
+      <li>Modify the NSG rule to deny ICMP and test to ensure pings are blocked, demonstrating NSG’s effect on traffic control.</li>
+    </ul>
+  </li>
+</ol>
+
+---
 
 <!-- Step 4: Inspecting SSH, DHCP, DNS, and RDP Traffic -->
 <h3>Step 4: Inspecting SSH, DHCP, DNS, and RDP Traffic</h3>
@@ -62,22 +152,37 @@ In this project, we conduct network security and traffic analysis experiments us
 <p align="center">
   <img src="INSERT_IMAGE_URL" alt="Observing SSH Traffic" width="80%"/>
 </p>
-<p>Observations of SSH traffic when connecting to the Ubuntu VM, including command interactions and security considerations.</p>
 
-<p align="center">
-  <img src="INSERT_IMAGE_URL" alt="Observing DHCP Traffic" width="80%"/>
-</p>
-<p>Details of DHCP traffic when renewing IP addresses on the VMs and what this means in a network management context.</p>
+<h4>Step-by-Step Instructions:</h4>
+<ol>
+  <li>Inspect SSH Traffic:
+    <ul>
+      <li>From the Windows VM, use a terminal to SSH into the Ubuntu VM (`ssh labuser@[Ubuntu-VM Private IP]`).</li>
+      <li>In Wireshark, use the filter `ssh` to capture the SSH traffic, observing the secure connection setup.</li>
+    </ul>
+  </li>
 
-<p align="center">
-  <img src="INSERT_IMAGE_URL" alt="Observing DNS Traffic" width="80%"/>
-</p>
-<p>Insights into DNS traffic, illustrating the process of domain name resolution and its importance for connectivity.</p>
+  <li>Inspect DHCP Traffic:
+    <ul>
+      <li>In Wireshark, filter for DHCP traffic (`bootp`) and observe IP address requests and assignments.</li>
+      <li>Renew the IP address on the Windows VM using `ipconfig /renew` in Command Prompt to see DHCP interactions.</li>
+    </ul>
+  </li>
 
-<p align="center">
-  <img src="INSERT_IMAGE_URL" alt="Observing RDP Traffic" width="80%"/>
-</p>
-<p>Analysis of RDP traffic, highlighting the continuous data flow and its implications for remote monitoring and control.</p>
+  <li>Inspect DNS Traffic:
+    <ul>
+      <li>Use the command `nslookup [website.com]` to observe DNS requests and responses in Wireshark (`dns` filter).</li>
+    </ul>
+  </li>
+
+  <li>Inspect RDP Traffic:
+    <ul>
+      <li>Filter for RDP traffic (`tcp.port == 3389`) to see the continuous stream of RDP data, demonstrating live remote desktop connections.</li>
+    </ul>
+  </li>
+</ol>
+
+---
 
 <!-- Lab Cleanup -->
 <h3>Lab Cleanup</h3>
@@ -85,7 +190,24 @@ In this project, we conduct network security and traffic analysis experiments us
 <p align="center">
   <img src="INSERT_IMAGE_URL" alt="Lab Cleanup" width="80%"/>
 </p>
-<p>Confirmation of resource deletion and best practices for managing cloud resources.</p>
+
+<h4>Step-by-Step Instructions:</h4>
+<ol>
+  <li>Stop the VMs:
+    <ul>
+      <li>Go to each VM in the Azure Portal and click "Stop" to avoid incurring costs while not in use.</li>
+    </ul>
+  </li>
+
+  <li>Delete the Resource Group:
+    <ul>
+      <li>Once you're done, delete the entire resource group to clean up all associated resources.</li>
+      <li>Navigate to "Resource Groups," select your group, click "Delete Resource Group," and confirm.</li>
+    </ul>
+  </li>
+</ol>
+
+---
 
 <h2>Purpose of the Lab</h2>
 <p>
@@ -108,6 +230,3 @@ In this project, we conduct network security and traffic analysis experiments us
   <li><strong>Understanding Protocol Behavior:</strong> Analyzing common network protocols and their behavior to better understand how data is transmitted and secured across networks.</li>
   <li><strong>Real-World IT Support Scenarios:</strong> Simulating real-world IT support scenarios that involve monitoring, troubleshooting, and securing network environments.</li>
 </ul>
-
-<h2>Summary</h2>
-<p>This project demonstrates a practical understanding of managing network traffic and security within Azure environments. By using Wireshark and configuring Network Security Groups, we gain insights into how different types of traffic behave and how they can be controlled to enhance security and performance.</p>
